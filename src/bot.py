@@ -4,8 +4,9 @@ import time
 
 import config
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from colorama import Back, Fore, Style
+from tasks.common.nasapicofday import get_nasapicoftheday
 
 MY_GUILD = discord.Object(id=config.botConfig["hub-server-guild-id"])
 
@@ -37,6 +38,12 @@ class Client(commands.Bot):
 
         await self.tree.sync(guild=MY_GUILD)
 
+    @tasks.loop(minutes=1)
+    async def nasapicoftheday(self):
+        channel = self.get_channel(1091022612655788116)
+        pic_embed = await get_nasapicoftheday()
+        await channel.send(embed=pic_embed)
+
     async def on_ready(self):
         prfx = (Back.BLACK + Fore.GREEN + time.strftime("%H:%M:%S UTC", time.gmtime()) + Back.RESET + Fore.WHITE + Style.BRIGHT)
         print(f"{prfx} Logged in as {Fore.YELLOW} {self.user.name}")
@@ -45,7 +52,7 @@ class Client(commands.Bot):
         print(f"{prfx} Python Version {Fore.YELLOW} {str(platform.python_version())}")
         print(f"{prfx} Bot Version 0.1")
         print(f"{prfx} Slash CMDs Synced: {Fore.YELLOW + str(len(await self.tree.fetch_commands(guild=MY_GUILD)))} Commands")
-
+        self.nasapicoftheday.start()
 
 client = Client()
 client.run(config.botConfig["token"])
