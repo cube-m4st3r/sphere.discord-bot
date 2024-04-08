@@ -6,8 +6,8 @@ from collections import Counter
 class image_manipulation():
 
     @classmethod
-    async def _get_highest_frequency_color_hex(cls, response):
-        image_bytes = BytesIO(response.content)
+    async def _get_highest_frequency_color_hex(cls, image_data):
+        image_bytes = BytesIO(image_data)
 
         image = Image.open(image_bytes)
 
