@@ -1,7 +1,7 @@
 class AnimeGenre:
     def __init__(self, data: dict):
         self._id = "N/A" # fix soon
-        self._name = data
+        self._name = data["genre"]
 
     @property
     def id(self):
