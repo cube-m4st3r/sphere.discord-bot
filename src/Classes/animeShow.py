@@ -1,22 +1,56 @@
 from Classes.animeGenres import AnimeGenre
 from Classes.animeThemes import AnimeTheme
+from datetime import datetime
+import json
 
 class AnimeShow:
     def __init__(self, data: dict):
-        show_data = data["anime_show"]
-        self._id = show_data["id"]
-        self._title = show_data["title"]
-        self._type = show_data["type"]
-        self._episodes_amount = show_data["eps_amount"]
-        self._status = show_data["status"]
-        self._aired_start = show_data["aired_start"]["date"]
-        self._aired_end = show_data["aired_end"]["date"]
-        self._premiered = show_data["premiered"]
-        self._broadcast = show_data["broadcast"]
-        self._source = show_data["source"]
-        self._genre = [AnimeGenre(data=genre) for genre in data["genres"]]
-        self._theme = [AnimeTheme(data=theme) for theme in data["themes"]]
+        self._id = data["id"]
+        self._title = data["title"]
+        self._type = data["type"]
+        self._episodes_amount = data["episodes_amount"]
+        self._status = data["status"]
+        self._aired_start = self._parse_date(data["aired_start"])
+        self._aired_end = self._parse_date(data["aired_end"])
+        self._premiered = data["premiered"]
+        self._broadcast = data["broadcast"]
+        self._source = data["source"]
+        self._genre = [AnimeGenre(data=genre) for genre in data["animeshowgenres"]]
+        self._theme = [AnimeTheme(data=theme) for theme in data["animeshowthemes"]]
 
+    def _parse_date(self, date_str):
+        try:
+            return datetime.fromisoformat(date_str)
+        except ValueError:
+            return date_str
+
+    def to_dict(self):
+        return {
+            "id": self._id,
+            "title": self._title,
+            "type": self._type,
+            "episodes_amount": self._episodes_amount,  # Use camelCase for consistency with entity properties
+            "status": self._status,
+            "aired_start": self._aired_start.isoformat() if self._aired_start else None,  # Use ISO 8601 format
+            "aired_end": self._aired_end.isoformat() if self._aired_end else None,  # Use ISO 8601 format
+            "premiered": self._premiered,
+            "broadcast": self._broadcast,
+            "source": self._source,
+            "animeshowgenres": [genre.to_dict() for genre in self._genre],
+            "animeshowthemes": [theme.to_dict() for theme in self._theme]
+        }
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
+    @staticmethod
+    def from_dict(data):
+        return AnimeShow(data)
+
+    @staticmethod
+    def from_json(json_str):
+        data = json.loads(json_str)
+        return AnimeShow.from_dict(data)
     
     @property
     def id(self):

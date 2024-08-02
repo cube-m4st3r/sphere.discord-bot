@@ -1,7 +1,19 @@
 class AnimeGenre:
     def __init__(self, data: dict):
-        self._id = "N/A" # fix soon
-        self._name = data["genre"]
+        self._id = data["animegenre"]["id"] # fix soon
+        self._name = data["animegenre"]["name"]
+
+    def to_dict(self):
+        return {
+            "animegenre": {
+                "id": self._id,
+                "name": self._name
+            }    
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return AnimeGenre(data)
 
     @property
     def id(self):
